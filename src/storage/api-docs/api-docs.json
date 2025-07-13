@@ -1,0 +1,192 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API Calon Sukses",
+        "description": "Dokumentasi endpoint Midtrans Webhook",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/midtrans/manual": {
+            "post": {
+                "tags": [
+                    "Midtrans"
+                ],
+                "summary": "Midtrans manual callback (kirim invoice email)",
+                "description": "Endpoint ini menangani callback manual dari Midtrans. Jika status transaksi adalah `settlement`, maka sistem akan memperbarui status pembayaran, mendaftarkan user ke kursus terkait, dan mengirimkan invoice melalui email.",
+                "operationId": "e6875542ee709456af2be484332255bc",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "order_id",
+                                    "transaction_status"
+                                ],
+                                "properties": {
+                                    "order_id": {
+                                        "type": "string",
+                                        "example": "INV-ABC1234567"
+                                    },
+                                    "transaction_status": {
+                                        "type": "string",
+                                        "example": "settlement"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Berhasil memproses transaksi dan mengirim email invoice",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Transaksi tidak ditemukan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Payment not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/midtrans/webhook": {
+            "post": {
+                "tags": [
+                    "Midtrans"
+                ],
+                "summary": "Handle Midtrans webhook",
+                "operationId": "8b701e16e5e96759d975f70ab804c3cf",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "order_id": {
+                                        "type": "string"
+                                    },
+                                    "transaction_status": {
+                                        "type": "string"
+                                    },
+                                    "payment_type": {
+                                        "type": "string"
+                                    },
+                                    "transaction_id": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/api/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Register user baru dan kirim notifikasi WhatsApp",
+                "description": "Endpoint ini melakukan pendaftaran user baru dan mengirimkan notifikasi WhatsApp ke nomor yang didaftarkan (jika tersedia).",
+                "operationId": "356aef5918a2e9bef0be1b61cd240dd6",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Budi Santoso"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "budi@example.com"
+                                    },
+                                    "no_wa": {
+                                        "type": "string",
+                                        "example": "081234567890"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "description": "Redirect ke dashboard setelah berhasil register"
+                    },
+                    "422": {
+                        "description": "Validasi gagal"
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Midtrans",
+            "description": "Endpoint terkait pembayaran Midtrans"
+        },
+        {
+            "name": "Auth",
+            "description": "Auth"
+        }
+    ]
+}
